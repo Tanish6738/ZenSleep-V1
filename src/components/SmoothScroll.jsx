@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const SmoothScroll = ({ children }) => {
+const SmoothScroll = ({ children, disableAutoSectionNav = false }) => {
   // Use refs to store event handlers for proper cleanup
   const eventHandlersRef = useRef({});
   
@@ -144,9 +144,7 @@ const SmoothScroll = ({ children }) => {
           console.warn('Parallax effect error:', error);
         }
       });
-    }, 50); // More frequent updates for smoother parallax
-
-    // Add scroll snap effect to section elements if needed
+    }, 50); // More frequent updates for smoother parallax    // Add scroll snap effect to section elements if needed
     const addScrollSnap = () => {
       // Only add this if data-scroll-snap attribute is set on the body
       const snapType = document.body.getAttribute('data-scroll-snap');
@@ -155,31 +153,47 @@ const SmoothScroll = ({ children }) => {
       const style = document.createElement('style');
       style.id = 'scroll-snap-style';
       
-      // Different snap behaviors based on attribute value
+      // Different snap behaviors based on attribute value and device type
+      const isMobile = window.innerWidth <= 768;
       let snapSettings;
-      switch (snapType) {
-        case 'strict':
-          snapSettings = `
-            html {
-              scroll-snap-type: y mandatory;
-            }
-            section {
-              scroll-snap-align: start;
-              scroll-snap-stop: always;
-            }
-          `;
-          break;
-        case 'proximity':
-        default:
-          snapSettings = `
-            html {
-              scroll-snap-type: y proximity;
-            }
-            section {
-              scroll-snap-align: start;
-            }
-          `;
-          break;
+      
+      if (isMobile) {
+        // Even more forgiving scroll snap for mobile to prevent accidental snapping
+        snapSettings = `
+          html {
+            scroll-snap-type: none;
+          }
+          section {
+            scroll-snap-align: none;
+            scroll-snap-stop: none;
+          }
+        `;
+      } else {
+        // Desktop snap settings based on attribute value
+        switch (snapType) {
+          case 'strict':
+            snapSettings = `
+              html {
+                scroll-snap-type: y mandatory;
+              }
+              section {
+                scroll-snap-align: start;
+                scroll-snap-stop: always;
+              }
+            `;
+            break;
+          case 'proximity':
+          default:
+            snapSettings = `
+              html {
+                scroll-snap-type: y proximity;
+              }
+              section {
+                scroll-snap-align: start;
+              }
+            `;
+            break;
+        }
       }
       
       style.innerHTML = snapSettings;
@@ -235,26 +249,50 @@ const SmoothScroll = ({ children }) => {
       window.addEventListener('wheel', handlers.onWheel, { passive: false });
       
       return () => window.removeEventListener('wheel', handlers.onWheel);
-    };
-
-    // Add touch swipe navigation for mobile devices
+    };    // Add touch swipe navigation for mobile devices
     const addTouchNavigation = () => {
+      // Skip adding touch navigation if disabled
+      if (disableAutoSectionNav) return () => {};
+      
       let touchStartY = 0;
       let touchEndY = 0;
-      const minSwipeDistance = 50;
+      let touchStartX = 0; // Also track X position for diagonal swipes
+      // Significantly increase minimum swipe distance to require very intentional swipes
+      const minSwipeDistance = 150; // Increased from 50 to 150
+      // Add a time threshold to detect quick flicks vs. slow scrolls
+      let touchStartTime = 0;
+      let touchEndTime = 0;
+      const maxSwipeTime = 300; // Maximum time in ms for a swipe to be considered intentional
       
       handlers.touchStart = (e) => {
         touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        touchStartTime = new Date().getTime();
       };
       
       handlers.touchEnd = (e) => {
         touchEndY = e.changedTouches[0].clientY;
-        handleSwipe();
+        const touchEndX = e.changedTouches[0].clientX;
+        touchEndTime = new Date().getTime();
+        
+        // Calculate both vertical and horizontal distance
+        const verticalDistance = touchStartY - touchEndY;
+        const horizontalDistance = touchStartX - touchEndX;
+        
+        // If horizontal movement is significant, it's probably a horizontal swipe/scroll
+        // so don't trigger section navigation
+        if (Math.abs(horizontalDistance) > Math.abs(verticalDistance) * 0.8) {
+          return;
+        }
+        
+        // Only process if it was a quick swipe gesture
+        if (touchEndTime - touchStartTime < maxSwipeTime) {
+          handleSwipe(verticalDistance);
+        }
       };
       
-      const handleSwipe = () => {
-        const distance = touchStartY - touchEndY;
-        
+      const handleSwipe = (distance) => {
+        // Only process swipes that are large enough and fast enough
         if (Math.abs(distance) < minSwipeDistance) return;
         
         // Get all section elements for navigation

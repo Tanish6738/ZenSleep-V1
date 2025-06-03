@@ -41,6 +41,19 @@ html {
   height: 100%;
 }
 
+/* Adjust scrolling behavior on mobile devices */
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: none !important; /* Disable snap scrolling on mobile */
+    overscroll-behavior: contain; /* Prevent browser bounce effect on mobile */
+  }
+  
+  section {
+    scroll-snap-align: none !important;
+    scroll-snap-stop: none !important;
+  }
+}
+
 body {
   min-height: 100%;
   overflow-x: hidden;

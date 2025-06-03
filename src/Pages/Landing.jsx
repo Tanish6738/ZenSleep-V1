@@ -29,7 +29,6 @@ const Landing = () => {
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
   // Add section IDs and set up scroll behavior
   useEffect(() => {
     // Define section IDs for navigation
@@ -54,6 +53,16 @@ const Landing = () => {
         sectionElement.id = id;
       }
     });
+
+    // Improve touch scrolling behavior on mobile
+    if (isMobile) {
+      // Add a higher touch-action value to all sections to improve control
+      const sections = document.querySelectorAll('section');
+      sections.forEach(section => {
+        section.style.touchAction = 'pan-y';
+        section.style.overscrollBehavior = 'contain';
+      });
+    }
 
     // Handle initial navigation if URL has a hash
     if (window.location.hash) {
@@ -113,9 +122,7 @@ const Landing = () => {
         <FAQSection />
         <ContactSection />
         <Footer />
-      </main>
-
-      {/* Floating navigation */}
+      </main>      {/* Floating navigation */}
       <ScrollToSection
         sections={navigationSections}
         position={isMobile ? "right" : "right"}
@@ -125,16 +132,16 @@ const Landing = () => {
         activeClass="text-[var(--accent-1)] scale-125"
         itemClassName={
           isMobile
-            ? "w-3 h-3 rounded-full bg-gray-200 hover:bg-[var(--accent-1-alt)]"
+            ? "w-4 h-4 rounded-full bg-gray-200 hover:bg-[var(--accent-1-alt)]"
             : "w-4 h-4 rounded-full bg-gray-200 hover:bg-[var(--accent-1-alt)]"
         }
         containerClassName={
           isMobile
-            ? "py-2 px-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md"
+            ? "py-4 px-3 bg-white/90 backdrop-blur-sm rounded-full shadow-md"
             : "py-3 px-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md"
         }
-        alwaysVisible={false} 
-        fadeIn={true}
+        alwaysVisible={isMobile ? true : false} 
+        fadeIn={!isMobile}
         highlightActive={true}
       />
     </>

@@ -110,10 +110,14 @@ const ScrollToSection = ({
       }
     };
   }, [sections, activeSection, alwaysVisible, highlightActive, isMobile]);
-
   // Scroll to section when a navigation item is clicked
   const scrollToSection = (id, e) => {
     e.preventDefault();
+    
+    // Don't scroll on small mobile movements (less than 5px)
+    if (e.type === 'touchend' && Math.abs(e.changedTouches[0].clientY - e.target.touchStartY) < 5) {
+      return;
+    }
     
     const element = document.getElementById(id);
     if (!element) return;
@@ -149,14 +153,17 @@ const ScrollToSection = ({
     clearTimeout(tooltipDelay);
     setTooltipDelay(setTimeout(() => setHoveredItem(null), 300)); // Hide tooltip after 300ms delay
   };
-
   // Handle touch interactions for mobile devices
-  const handleTouchStart = (id) => {
+  const handleTouchStart = (id, e) => {
+    if (e && e.touches && e.touches[0]) {
+      // Store the touch start position on the element for later comparison
+      e.currentTarget.touchStartY = e.touches[0].clientY;
+    }
     clearTimeout(tooltipDelay);
     setHoveredItem(id);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
     clearTimeout(tooltipDelay);
     setTooltipDelay(setTimeout(() => setHoveredItem(null), 1500)); // Keep tooltip visible longer on mobile
   };
@@ -249,13 +256,12 @@ const ScrollToSection = ({
       transition={{ duration: 0.3 }}
       aria-label="Page navigation"
     >
-      {sections.map(({ id, label, icon }) => (
-        <div 
+      {sections.map(({ id, label, icon }) => (        <div 
           key={id} 
           className="relative"
           onMouseEnter={() => handleMouseEnter(id)}
           onMouseLeave={handleMouseLeave}
-          onTouchStart={() => handleTouchStart(id)}
+          onTouchStart={(e) => handleTouchStart(id, e)}
           onTouchEnd={handleTouchEnd}
         >
           <motion.a

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Landing from './Pages/Landing'
 import SmoothScroll from './components/SmoothScroll'
 import ScrollIndicator from './components/ScrollIndicator'
@@ -74,8 +74,31 @@ const App = () => {
     };
   }, []);
 
+  // Detect if on mobile device
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTouch, setIsTouch] = useState(false);
+  
+  useEffect(() => {
+    // Check if device has touch capability
+    const detectTouch = () => {
+      setIsTouch('ontouchstart' in window || 
+                 navigator.maxTouchPoints > 0 || 
+                 navigator.msMaxTouchPoints > 0);
+    };
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      detectTouch();
+    };
+    
+    // Initial detection
+    detectTouch();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <SmoothScroll>
+    <SmoothScroll disableAutoSectionNav={isMobile && isTouch}>
       <ScrollIndicator 
         showPercentage={false} 
         height={3}
