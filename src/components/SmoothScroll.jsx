@@ -82,7 +82,7 @@ const SmoothScroll = ({ children }) => {
       scrollToTopButton.style.cssText = `
         position: fixed;
         bottom: 30px;
-        right: 60px;
+        right: 90px;
         width: 50px;
         height: 50px;
         border-radius: 50%;
