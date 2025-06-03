@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+:root {
+  /* Color Palette - Zen Modernism Theme */
+  --primary-bg: #F8F8F4; /* Soft Off-White / Light Cream */
+  --primary-bg-alt: #FDFDFC; /* Almost white, but warmer */
+  --accent-1: #8B9E90; /* Muted Sage Green */
+  --accent-1-alt: #D4BE98; /* Pale Gold (for subtle highlights and calls to action) */
+  --accent-2: #C0E0EE; /* Very Light Sky Blue */
+  --accent-2-alt: #A0DCDC; /* Alternate Light Sky Blue (for subtle gradients or background elements) */
+  --text-primary: #2A2A2A; /* Dark Charcoal Gray for main body text */
+  --text-primary-alt: #1A2D3A; /* Deep Navy Blue alternative for main body text */
+  
+  /* Scrollbar Variables */
+  --scrollbar-width: 10px;
+  --scrollbar-track: rgba(192, 224, 238, 0.1);
+  --scrollbar-thumb: rgba(139, 158, 144, 0.4);
+  --scrollbar-thumb-hover: rgba(139, 158, 144, 0.7);
+  
+  /* Scroll Behavior Variables */
+  --scroll-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --scroll-duration: 800ms;
+  --scroll-padding-top: 80px; /* Default value, will be set dynamically */
+  
+  /* Section Spacing Variables */
+  --section-padding-top: 7rem;
+  --section-padding-bottom: 7rem;
+  --section-padding-top-mobile: 5rem;
+  --section-padding-bottom-mobile: 5rem;
+  
+  /* Touch Target Sizes */
+  --min-touch-target-size: 44px;
+  --tooltip-delay: 200ms;
+}
+
+/* Enable smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--scroll-padding-top); /* Adjust for fixed headers */
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+}
+
+/* Custom smooth scrolling for all elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Hide default scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+/* Track styling */
+::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track);
+  border-radius: 10px;
+}
+
+/* Handle styling */
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Handle on active state */
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--accent-1);
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Section styling for proper scroll-to behavior */
+section {
+  padding-top: var(--section-padding-top);
+  padding-bottom: var(--section-padding-bottom);
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: var(--scroll-padding-top); /* Modern browsers */
+}
+
+/* Responsive section padding for mobile */
+@media (max-width: 768px) {
+  section {
+    padding-top: var(--section-padding-top-mobile);
+    padding-bottom: var(--section-padding-bottom-mobile);
+  }
+}
+
+/* ScrollToSection component styling */
+.scroll-to-section {
+  z-index: 50;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  touch-action: manipulation;
+}
+
+.scroll-to-section-item {
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  .scroll-to-section-item {
+    min-width: var(--min-touch-target-size);
+    min-height: var(--min-touch-target-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Tooltip styles for section navigation */
+.scroll-to-section-tooltip {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  color: var(--text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 158, 144, 0.2);
+  z-index: 60;
+  pointer-events: none;
+  transform-origin: center;
+  animation: tooltipFadeIn 0.2s var(--scroll-ease);
+}
+
+/* Animation for tooltip appearance */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Active section indicator styling */
+.scroll-to-section-item.active {
+  color: var(--accent-1);
+  transform: scale(1.2);
+}
+
+/* Landing page main container */
+.landing-page {
+  position: relative;
+}
+
+/* Enhanced focus styles for accessibility */
+a:focus, button:focus {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users, keep for keyboard navigation */
+a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Apply smooth transitions for mobile menu items */
+@media (max-width: 768px) {
+  .scroll-to-section {
+    touch-action: manipulation;
+  }
+  
+  a, button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
